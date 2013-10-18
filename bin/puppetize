@@ -4,5 +4,5 @@ require "rubygems"
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 require "puppetize"
 
-exit(PUPPETIZE::Command.run || 0)
+Puppetize::CommandLine.new
 

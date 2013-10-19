@@ -10,6 +10,8 @@ module Puppetize
 
       # Create config dir if it doesn't exists:
       @config_dir = File.join(File.expand_path('~'),'.puppetize')
+      @module_dir = File.join(File.expand_path('~'),'puppetize-module')
+      @rpm_db = File.join(@config_dir,'rpmlist.db')
       FileUtils.mkdir @config_dir if Dir.glob(@config_dir).empty?
 
     end
@@ -17,15 +19,50 @@ module Puppetize
     def init
 
       rpm_list = %x[rpm -qa]
-      File.write(File.join(@config_dir,'rpmlist.db'), rpm_list)
-
+      File.open(@rpm_db, 'w') {|f| f.write(rpm_list) }
+      
     end
-
 
     def build
 
-      puts "build"
+      # Verify puppet is installed:
+      
+      test = ENV['PATH'].split(':').map do |folder| 
+        File.exists?(File.join(folder,'puppet')) 
+      end
 
+      if ! test.include? true 
+        puts "ERROR: Puppet is not installed or not available on default path"
+      end
+
+      # Generate a standard empty module
+
+      generate_cmd = "puppet module generate puppetize-module"
+      %x[#{generate_cmd}]
+
+      # Generate the Package resources:
+     
+      rpm_list = %x[rpm -qa].split("\n")
+      init_rpm_list = File.read(@rpm_db).split("\n")
+      puppet_rpm_list = rpm_list - init_rpm_list 
+
+      packagelist = []
+
+      puppet_rpm_list.each do |rpm|
+        name = %x[rpm --query --qf %{NAME} #{rpm}]
+        version = %x[rpm --query --qf %{VERSION} #{rpm}]
+        release = %x[rpm --query --qf %{RELEASE} #{rpm}]
+        packagelist << [name,version,release]
+      end
+
+      # Generate install.pp based on ERB template
+      template = File.join(File.dirname(__FILE__), '..', '..', 'tpl', 'install.pp.erb')
+      renderer = ERB.new(File.read(template))
+      output = renderer.result(binding)
+      File.open(File.join(@module_dir,'manifests','install.pp'),'w') {|f| f.write(output)}
+
+      
+      
     end
 
     def reset

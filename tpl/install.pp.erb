@@ -1,0 +1,10 @@
+
+class module::install {
+
+<% for pkg in packagelist %>
+  package {'<%= pkg[0] %>':
+    ensure => '<%= pkg[1] %>-<%= pkg[2] %>',
+  }
+<% end %>
+
+}

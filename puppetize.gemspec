@@ -1,14 +1,31 @@
-Gem::Specification.new do |s|
-  s.name          = 'puppetize'
-  s.version       = '0.0.1'
-  s.executables   << 'puppetize'
-  s.date          = '2013-10-15'
-  s.summary       = "A puppet module generation tool"
-  s.description   = "Puppetize is a tool that can generate complete modules from systems"
-  s.authors       = ["Juan Breinlinger"]
-  s.email         = 'juan.brein@breins.net'
-  s.require_paths = ['lib']
-  s.file          = ['LICENSE','README.md']
-  s.homepage      = 'https://github.com/BreinsNet/puppetize'
-  s.license       = 'GPL v3'
+require File.join(File.dirname(__FILE__), "lib/fpm/version")
+
+Gem::Specification.new do |spec|
+
+  files = []
+  dirs = %w{lib bin}
+  dirs.each do |dir|
+    files += Dir["#{dir}/**/*"]
+  end
+
+  files << README.md
+  files << LICENSE
+  files << CONTRIBUTORS
+
+  # Sort out dependencies:
+  
+  spec.add_dependency("trollop", ">= 2.0") 
+ 
+  spec.name          = 'puppetize'
+  spec.version       = '0.0.3'
+  spec.executables   = 'puppetize'
+  spec.date          = '2013-10-15'
+  spec.summary       = "A puppet module generation tool"
+  spec.description   = "Puppetize is a tool that can generate complete modules from systems"
+  spec.authors       = ["Juan Breinlinger"]
+  spec.email         = 'juan.brein@breins.net'
+  spec.require_paths = ['lib']
+  spec.files         = files
+  spec.homepage      = 'https://github.com/BreinsNet/puppetize'
+  spec.license       = 'GPL v3'
 end

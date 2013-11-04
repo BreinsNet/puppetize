@@ -1,0 +1,15 @@
+
+class module::config {
+
+<% for file in puppet_file_list %>
+  file {'<%= file[:path] %>':
+    ensure  => present,
+    owner   => '<%= file[:owner] %>',
+    group   => '<%= file[:group] %>',
+    mode    => '<%= file[:mode] %>',
+    content => template("${module_name}/<%= file[:name] %>.erb")
+    source  => "puppet:///modules/${module_name}/<%= file[:name] %>"
+  }
+<% end %>
+
+}

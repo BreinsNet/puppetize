@@ -1,5 +1,7 @@
 require 'fileutils'
 require 'erb'
 require 'pp'
+require 'open4'
 require 'puppetize/puppetize'
 require 'puppetize/command_line'
+require 'puppetize/stdlib'

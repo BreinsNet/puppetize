@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), "lib/fpm/version")
+require File.join(File.dirname(__FILE__), "lib/puppetize/version")
 
 Gem::Specification.new do |spec|
 
@@ -8,18 +8,18 @@ Gem::Specification.new do |spec|
     files += Dir["#{dir}/**/*"]
   end
 
-  files << README.md
-  files << LICENSE
-  files << CONTRIBUTORS
+  files << "README.md"
+  files << "LICENSE"
+  files << "CONTRIBUTORS"
 
   # Sort out dependencies:
   
   spec.add_dependency("trollop", ">= 2.0") 
  
   spec.name          = 'puppetize'
-  spec.version       = '0.0.3'
+  spec.version       = '0.0.4'
   spec.executables   = 'puppetize'
-  spec.date          = '2013-10-15'
+  spec.date          = '2013-11-04'
   spec.summary       = "A puppet module generation tool"
   spec.description   = "Puppetize is a tool that can generate complete modules from systems"
   spec.authors       = ["Juan Breinlinger"]

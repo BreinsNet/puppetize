@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("open4", ">= 1.0") 
  
   spec.name              = 'puppetize'
-  spec.version           = Puppetize.VERSION
+  spec.version           = Puppetize::VERSION
   spec.executables       = 'puppetize'
   spec.date              = Time.now.strftime('%Y-%m-%d')
   spec.summary           = "A puppet module generation tool"

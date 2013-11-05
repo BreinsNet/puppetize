@@ -64,23 +64,46 @@ Finally you can reset the state and start over doing:
 
     puppetize reset
 
+## Example:
+
+<pre>
+
+[root@test-vm ~]# puppetize init
+[root@test-vm ~]# yum install -y telnet httpd
+[root@test-vm ~]# vim /etc/httpd/conf/httpd.conf 
+[root@test-vm ~]# puppetize build
+[root@test-vm ~]# find /root/puppetize-module/
+/root/puppetize-module/
+/root/puppetize-module/spec
+/root/puppetize-module/spec/spec_helper.rb
+/root/puppetize-module/Modulefile
+/root/puppetize-module/files
+/root/puppetize-module/files/httpd.conf
+/root/puppetize-module/manifests
+/root/puppetize-module/manifests/init.pp
+/root/puppetize-module/manifests/config.pp
+/root/puppetize-module/manifests/install.pp
+/root/puppetize-module/templates
+/root/puppetize-module/templates/httpd.conf.erb
+/root/puppetize-module/tests
+/root/puppetize-module/tests/init.pp
+/root/puppetize-module/README
+
+</pre>
+
 ## Known issues
 
-- At the moment puppetize will only create:
+* At the moment puppetize will only create:
 
 package
 file -> files
 file -> directories
 
-- It won't create empty directory definitions.
+* It won't create empty directory definitions.
 
 ## TODO:
 
-Implement every other resource like:
-
-mount
-service
-etc...
+Implement every other resource like: mount service etc...
 
 ## Need Help or Want to Contribute?
 

@@ -101,6 +101,8 @@ file -> directories
 
 * It won't create empty directory definitions.
 
+* Only supports Redhat base distributions
+
 ## TODO:
 
 Implement every other resource like: mount service etc...

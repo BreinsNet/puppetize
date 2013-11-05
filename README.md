@@ -40,21 +40,47 @@ out there.
 
 ## Get with the download
 
+Install dependencies, 
+
+    yum install -y git rubygems puppet
+
+NOTE: You'll need extra repositories from puppetlabs to install puppet:
+
 You can install puppetize with gem:
 
-    gem install fpm
+    gem install puppetize
 
-Gather the initial state might look something like this:
+Collect the initial system state:
 
     puppetize init
 
-Build the module will be something like:
+Build the module:
 
     puppetize build
+
+This will create a new puppet standard module under /root/puppetize-module with all the necessary resources to implement the changes between the initial state and now.
 
 Finally you can reset the state and start over doing:
 
     puppetize reset
+
+## Known issues
+
+- At the moment puppetize will only create:
+
+package
+file -> files
+file -> directories
+
+- It won't create empty directory definitions.
+
+## TODO:
+
+Implement every other resource like:
+
+mount
+service
+etc...
 
 ## Need Help or Want to Contribute?
 

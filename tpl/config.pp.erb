@@ -3,12 +3,14 @@ class module::config {
 
 <% for file in puppet_file_list %>
   file {'<%= file[:path] %>':
-    ensure  => present,
+    ensure  => <%= file[:ensure] %>,
     owner   => '<%= file[:owner] %>',
     group   => '<%= file[:group] %>',
     mode    => '<%= file[:mode] %>',
+<% if file[:ensure] == 'present' %>
     content => template("${module_name}/<%= file[:name] %>.erb")
     source  => "puppet:///modules/${module_name}/<%= file[:name] %>"
+<% end %>
   }
 <% end %>
 

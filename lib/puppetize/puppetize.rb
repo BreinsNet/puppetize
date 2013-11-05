@@ -8,6 +8,32 @@ module Puppetize
       # Check distribution dependency
       puts "\nSorry, Distribution not supported, only redhat based at the moment \n\n" unless File.exist?('/etc/redhat-release') 
 
+      # Verify necessary commands are installed:
+
+      commands = ['puppet','git']
+
+      commands.each do |command|
+
+        begin
+
+          test = ENV['PATH'].split(':').map do |folder| 
+            File.exists?(File.join(folder,command)) 
+          end
+
+          if ! test.include? true 
+            puts "ERROR - #{command} is not installed or not available on default path"
+            exit 1
+          end
+
+        rescue => e
+
+          STDERR.puts "ERROR - #{e}"
+          exit 1
+
+        end
+
+      end
+
       # Create config dir if it doesn't exists:
       @config_dir = File.join(File.expand_path('~'),'.puppetize')
       @module_dir = File.join(File.expand_path('~'),'puppetize-module')
@@ -63,37 +89,10 @@ module Puppetize
 
     def build
 
-      ##########################################
-      # Verify necessary commands are installed:
-
-      commands = ['puppet','git']
-
-      commands.each do |command|
-
-        begin
-
-          test = ENV['PATH'].split(':').map do |folder| 
-            File.exists?(File.join(folder,command)) 
-          end
-
-          if ! test.include? true 
-            puts "ERROR - #{command} is not installed or not available on default path"
-            exit 1
-          end
-
-        rescue => e
-
-          STDERR.puts "ERROR - #{e}"
-          exit 1
-
-        end
-
-      end
-
       ##################################
       # Generate a standard empty module
 
-      cmd "puppet module generate puppetize-module"
+      cmd "cd /root && puppet module generate puppetize-module"
       FileUtils.mkdir File.join(@module_dir,'files')
       FileUtils.mkdir File.join(@module_dir,'templates')
 
@@ -116,7 +115,7 @@ module Puppetize
       # Generate install.pp based on ERB template
       
       template = File.join(File.dirname(__FILE__), '..', '..', 'tpl', 'install.pp.erb')
-      renderer = ERB.new(File.read(template))
+      renderer = ERB.new(File.read(template),nil,'>')
       output = renderer.result(binding)
       File.open(File.join(@module_dir,'manifests','install.pp'),'w') {|f| f.write(output)}
 
@@ -152,12 +151,12 @@ module Puppetize
 
             filename = File.join(track[:path],file)
 
-            if not system "rpm -qf #{filename} > /dev/null 2>&1" 
-              puppet_files << filename
-              next
-            end
+            # If file does not belong to any package or it belongs but 
+            # it has been modified then puppetize it
 
-            puppet_files << filename if system "rpm -Vf #{filename}|grep #{filename} > /dev/null 2>&1" and File.file? file
+            if not system "rpm -qf #{filename} > /dev/null 2>&1" or system "rpm -Vf #{filename}|grep #{filename} > /dev/null 2>&1"
+              puppet_files << filename 
+            end
 
           end
 
@@ -169,8 +168,10 @@ module Puppetize
 
       puppet_files.each do |file|
 
-        FileUtils.cp file, File.join(@module_dir,'files')
-        FileUtils.cp file, File.join(@module_dir,'templates',file.split('/').last + ".erb")
+        if File.file? file
+          FileUtils.cp file, File.join(@module_dir,'files')
+          FileUtils.cp file, File.join(@module_dir,'templates',file.split('/').last + ".erb")
+        end
 
       end
 
@@ -179,23 +180,25 @@ module Puppetize
       puppet_files.each do |file|
 
         stat = File.stat file
-        mode = stat.mode.to_s 8
+        mode = stat.mode.to_s(8)[-3..-1]
         owner = Etc.getpwuid(stat.uid).name
         group = Etc.getgrgid(stat.gid).name
+        type = File.file?(file) ? "present" : "directory"
 
         puppet_file_list << {
-          :path  => file,
-          :owner => owner,
-          :group => group,
-          :mode  => mode,
-          :name  => file.split('/').last,
+          :path    => file,
+          :ensure  => type,
+          :owner   => owner,
+          :group   => group,
+          :mode    => mode,
+          :name    => file.split('/').last
         }
 
       end
 
       # Generate config.pp based on ERB template
       template = File.join(File.dirname(__FILE__), '..', '..', 'tpl', 'config.pp.erb')
-      renderer = ERB.new(File.read(template))
+      renderer = ERB.new(File.read(template),nil,'>')
       output = renderer.result(binding)
       File.open(File.join(@module_dir,'manifests','config.pp'),'w') {|f| f.write(output)}
 

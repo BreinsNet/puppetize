@@ -13,7 +13,7 @@ module Puppetize
       @module_dir = File.join(File.expand_path('~'),'puppetize-module')
       @rpm_db = File.join(@config_dir,'rpmlist.db')
       @trackdirs = [
-        {
+        { 
         :path => '/etc',
         :ignoredir => [
           'group',
@@ -25,10 +25,9 @@ module Puppetize
           'gshadow-',
           'passwd-',
           'shadow-',
-          'rc.d'
-          
-      ]
-      }
+          'rc.d' 
+          ]
+        }
       ]
 
       FileUtils.mkdir @config_dir if Dir.glob(@config_dir).empty?
@@ -38,13 +37,12 @@ module Puppetize
     def init
 
       # Remember what RPMs are installed
-      
+
       rpm_list = cmd "rpm -qa"
       File.open(@rpm_db, 'w') {|f| f.write(rpm_list) }
 
-      # Track all the files in the filesystem
-      #
-      
+      # Add a git repo to track the filesystem
+
       @trackdirs.each do |track|
 
         File.open(File.join(track[:path],".gitignore"),'w') do |f|
@@ -60,12 +58,12 @@ module Puppetize
         end
 
       end
-      
+
     end
 
     def build
 
-
+      ##########################################
       # Verify necessary commands are installed:
 
       commands = ['puppet','git']
@@ -91,7 +89,7 @@ module Puppetize
         end
 
       end
- 
+
       ##################################
       # Generate a standard empty module
 
@@ -101,7 +99,7 @@ module Puppetize
 
       #################################
       # Generate the Package resources:
-     
+
       rpm_list = cmd("rpm -qa").split("\n")
       init_rpm_list = File.read(@rpm_db).split("\n")
       puppet_rpm_list = rpm_list - init_rpm_list 
@@ -116,6 +114,7 @@ module Puppetize
       end
 
       # Generate install.pp based on ERB template
+      
       template = File.join(File.dirname(__FILE__), '..', '..', 'tpl', 'install.pp.erb')
       renderer = ERB.new(File.read(template))
       output = renderer.result(binding)
@@ -124,9 +123,9 @@ module Puppetize
 
       ######################################
       # Generate the configuration resources
-         
+
       puppet_files = Array.new
-      
+
       @trackdirs.each do |track|
 
         Dir.chdir track[:path] do
@@ -167,11 +166,11 @@ module Puppetize
       end
 
       # Copy the files to the files directory:
-      
 
       puppet_files.each do |file|
 
         FileUtils.cp file, File.join(@module_dir,'files')
+        FileUtils.cp file, File.join(@module_dir,'templates',file.split('/').last + ".erb")
 
       end
 

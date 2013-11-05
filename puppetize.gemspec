@@ -15,11 +15,12 @@ Gem::Specification.new do |spec|
   # Sort out dependencies:
   
   spec.add_dependency("trollop", ">= 2.0") 
+  spec.add_dependency("open4", ">= 1.0") 
  
   spec.name              = 'puppetize'
-  spec.version           = '0.0.4'
+  spec.version           = Puppetize.VERSION
   spec.executables       = 'puppetize'
-  spec.date              = '2013-11-04'
+  spec.date              = Time.now.strftime('%Y-%m-%d')
   spec.summary           = "A puppet module generation tool"
   spec.description       = "Puppetize is a tool that can generate complete modules from systems"
   spec.authors           = ["Juan Breinlinger"]
